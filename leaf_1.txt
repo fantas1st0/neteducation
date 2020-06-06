@@ -1,0 +1,329 @@
+
+leaf_1# sh run | no-more 
+
+!Command: show running-config
+!Running configuration last done at: Thu May 14 12:45:31 2020
+!Time: Thu May 14 13:51:16 2020
+
+version 9.3(3) Bios:version  
+hostname leaf_1
+vdc leaf_1 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+
+cfs eth distribute
+nv overlay evpn
+feature ospf
+feature bgp
+feature interface-vlan
+feature vn-segment-vlan-based
+feature lacp
+feature vpc
+feature nv overlay
+
+no password strength-check
+username admin password 5 $5$DDODCO$3U8KrxZt/hXZMLEBhPcfVyE2imiiFkZJgTEAMAilX/5  role network-admin
+ip domain-lookup
+copp profile strict
+snmp-server user admin network-admin auth md5 0x3964dc2366841d0ae5a46e1bcf2ec9c4 priv 0x3964dc2366841d0ae5a46e1bcf2ec9c4 localizedkey
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
+
+fabric forwarding anycast-gateway-mac 0001.0002.0003
+system vlan nve-overlay id 99
+vlan 1,10,20,99-100
+vlan 10
+  vn-segment 100010
+vlan 20
+  vn-segment 100020
+vlan 99
+  name nve_vlan
+vlan 100
+  vn-segment 200100
+
+vrf context A
+  vni 200100
+  rd auto
+  address-family ipv4 unicast
+    route-target import 65001:200100
+    route-target import 65001:200100 evpn
+    route-target export 65001:200100
+    route-target export 65001:200100 evpn
+vrf context keep
+vrf context management
+hardware access-list tcam region racl 512
+hardware access-list tcam region arp-ether 256 double-wide
+vpc domain 12
+  peer-switch
+  role priority 100
+  peer-keepalive destination 192.168.1.2 source 192.168.1.1 vrf keep
+  peer-gateway
+  ip arp synchronize
+
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan10
+  no shutdown
+  mtu 9216
+  vrf member A
+  no ip redirects
+  ip address 172.16.10.1/24
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan20
+  no shutdown
+  mtu 9216
+  vrf member A
+  no ip redirects
+  ip address 172.16.20.1/24
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan99
+  no shutdown
+  mtu 9216
+  no ip redirects
+  ip address 172.16.16.201/30
+  no ipv6 redirects
+  ip ospf network point-to-point
+  ip router ospf 1 area 0.0.0.1
+
+interface Vlan100
+  no shutdown
+  mtu 9216
+  vrf member A
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface port-channel1
+  mtu 9216
+
+interface port-channel6
+  switchport mode trunk
+  switchport trunk allowed vlan 10,20
+  mtu 9216
+  vpc 6
+
+interface port-channel12
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface nve1
+  no shutdown
+  host-reachability protocol bgp
+  advertise virtual-rmac
+  source-interface loopback1
+  member vni 100010
+    ingress-replication protocol bgp
+  member vni 100020
+    ingress-replication protocol bgp
+  member vni 200100 associate-vrf
+
+interface Ethernet1/1
+  switchport mode trunk
+  channel-group 12 mode active
+
+interface Ethernet1/2
+  switchport mode trunk
+  channel-group 12 mode active
+
+interface Ethernet1/3
+  no switchport
+  vrf member keep
+  ip address 192.168.1.1/30
+  no shutdown
+
+interface Ethernet1/4
+  no switchport
+  mtu 9216
+  ip address 172.16.16.1/31
+  ip ospf cost 4
+  ip ospf network point-to-point
+  ip router ospf 1 area 0.0.0.1
+  no shutdown
+
+interface Ethernet1/5
+  no switchport
+  mtu 9216
+  ip address 172.16.16.3/31
+  ip ospf cost 4
+  ip ospf network point-to-point
+  ip router ospf 1 area 0.0.0.1
+  no shutdown
+
+interface Ethernet1/6
+  switchport mode trunk
+  switchport trunk allowed vlan 10,20
+  mtu 9216
+  channel-group 6 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface mgmt0
+  vrf member management
+
+interface loopback0
+  ip address 172.16.16.101/32
+  ip router ospf 1 area 0.0.0.1
+
+interface loopback1
+  ip address 172.16.17.101/32
+  ip address 172.16.17.12/32 secondary
+  ip router ospf 1 area 0.0.0.1
+line console
+line vty
+boot nxos bootflash:/nxos.9.3.3.bin sup-1
+router ospf 1
+router bgp 65001
+  address-family l2vpn evpn
+    advertise-pip
+  template peer SPINE
+    remote-as 65001
+    update-source loopback0
+    address-family l2vpn evpn
+      send-community
+      send-community extended
+  neighbor 172.16.16.105
+    inherit peer SPINE
+  neighbor 172.16.16.106
+    inherit peer SPINE
+  vrf A
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+evpn
+  vni 100010 l2
+    rd auto
+    route-target import 65001:100010
+    route-target export 65001:100010
+
+
+
+leaf_1# 
