@@ -1,0 +1,33 @@
+hostname C-RP
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+interface Lo0
+ ip address 15.15.15.15 255.255.255.255
+ ip pim sparse-mode
+!
+interface Gi2
+ no shutdown
+interface Gi2.115
+ enc dot 115
+ ip address 172.1.15.15 255.255.255.0
+ ip pim sparse-mode
+!
+line cons 0
+ logg sync
+ exec-t 45 45
+!
+ip pim bsr-candidate Loopback0 0
+ip pim rp-candidate Loopback0
+!
+router bgp 65015
+ bgp router-id 15.15.15.15
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 172.1.15.1 remote-as 65001
+ !
+ address-family ipv4
+  neighbor 172.1.15.1 activate
+  network 15.15.15.15 mask 255.255.255.255
+  network 172.1.15.0 mask 255.255.255.0

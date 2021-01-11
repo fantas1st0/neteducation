@@ -1,0 +1,64 @@
+hostname RR
+!
+router ospf 1
+ router-id 8.8.8.8
+!
+interface Lo0
+ ip address 8.8.8.8 255.255.255.255
+ ip ospf 1 area 0
+!
+int Gi2
+ no shut
+int gi2.58
+ enc dot1q 58
+ ip address 10.5.8.8 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+int gi2.68
+ enc dot1q 68
+ ip address 10.6.8.8 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+!
+line cons 0
+ logg sync
+ exec-t 45 45
+!
+router ospf 1
+ log-adjacency-changes
+ passive-interface Lo0
+ max-metric router-lsa
+!
+mpls ldp router-id Lo0 force
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+int Lo0
+ ip pim sparse-mode
+!
+ip pim register-source Lo0
+!
+ip pim rp-candidate Lo0
+ip pim bsr-candidate Lo0
+!
+router bgp 65001
+ bgp router-id 8.8.8.8
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor MPLS_PE peer-group
+ neighbor MPLS_PE remote-as 65001
+ neighbor MPLS_PE update-source Loopback0
+ neighbor 1.1.1.1 peer-group MPLS_PE
+ neighbor 2.2.2.2 peer-group MPLS_PE
+ neighbor 3.3.3.3 peer-group MPLS_PE
+ neighbor 4.4.4.4 peer-group MPLS_PE
+ !
+ address-family vpnv4
+  neighbor MPLS_PE route-reflector-client
+  neighbor 1.1.1.1 activate
+  neighbor 2.2.2.2 activate
+  neighbor 3.3.3.3 activate
+  neighbor 4.4.4.4 activate

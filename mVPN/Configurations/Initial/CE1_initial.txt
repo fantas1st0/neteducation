@@ -1,0 +1,31 @@
+hostname CE1
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+interface Lo0
+ ip address 11.11.11.11 255.255.255.255
+ ip pim sparse-mode
+!
+interface Gi2
+ no shutdown
+interface Gi2.111
+ enc dot 111
+ ip address 172.1.11.11 255.255.255.0
+ ip pim sparse-mode
+!
+line cons 0
+ logg sync
+ exec-t 45 45
+!
+router bgp 65011
+ bgp router-id 11.11.11.11
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 172.1.11.1 remote-as 65001
+ !
+ address-family ipv4
+  neighbor 172.1.11.1 activate
+  network 11.11.11.11 mask 255.255.255.255
+  network 172.1.11.0 mask 255.255.255.0
+  

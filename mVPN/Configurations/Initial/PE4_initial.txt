@@ -1,0 +1,54 @@
+hostname PE4
+!
+router ospf 1
+ router-id 4.4.4.4
+!
+interface Lo0
+ ip address 4.4.4.4 255.255.255.255
+ ip ospf 1 area 0
+ ip pim sparse-mode
+!
+int Gi2
+ no shut
+int gi2.45
+ enc dot1q 45
+ ip address 10.4.5.4 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+ip pim register-source Lo0
+!
+ip vrf C-ONE
+ rd 4.4.4.4:1
+ route-target both 65001:1
+!
+ip multicast-routing vrf C-ONE distributed
+no ip pim vrf C-ONE autorp
+!
+interface Gi2.414
+ enc dot1q 414
+ ip vrf forwarding C-ONE
+ ip address 172.4.14.4 255.255.255.0
+ ip pim sparse-mode
+!
+router bgp 65001
+ bgp router-id 4.4.4.4
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 8.8.8.8 remote-as 65001
+ neighbor 8.8.8.8 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 8.8.8.8 activate
+ !
+ address-family ipv4 vrf C-ONE
+  neighbor 172.4.14.14 remote-as 65014
+  neighbor 172.4.14.14 activate
+!
+line cons 0
+ logg sync
+ exec-t 45 45

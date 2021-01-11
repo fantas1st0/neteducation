@@ -1,0 +1,30 @@
+hostname CE3
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+interface Lo0
+ ip address 13.13.13.13 255.255.255.255
+ ip pim sparse-mode
+!
+interface Gi2
+ no shutdown
+interface Gi2.313
+ enc dot 313
+ ip address 172.3.13.13 255.255.255.0
+ ip pim sparse-mode
+!
+line cons 0
+ logg sync
+ exec-t 45 45
+!
+router bgp 65013
+ bgp router-id 13.13.13.13
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 172.3.13.3 remote-as 65001
+ !
+ address-family ipv4
+  neighbor 172.3.13.3 activate
+  network 13.13.13.13 mask 255.255.255.255
+  network 172.3.13.0 mask 255.255.255.0
