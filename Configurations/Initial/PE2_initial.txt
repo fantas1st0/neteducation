@@ -1,0 +1,57 @@
+hostname PE2
+!
+router ospf 1
+ router-id 2.2.2.2
+!
+interface Lo0
+ ip address 2.2.2.2 255.255.255.255
+ ip ospf 1 area 0
+ ip pim sparse-mode
+!
+int Gi2
+ no shut
+int gi2.26
+ enc dot1q 26
+ ip address 10.2.6.2 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+int Lo0
+ ip pim sparse-mode
+!
+ip pim register-source Lo0
+!
+ip vrf C-ONE
+ rd 2.2.2.2:1
+ route-target both 65001:1
+!
+no ip pim vrf C-ONE autorp
+ip multicast-routing vrf C-ONE distributed
+!
+interface Gi2.212
+ enc dot1q 212
+ ip vrf forwarding C-ONE
+ ip address 172.2.12.2 255.255.255.0
+ ip pim sparse-mode
+!
+router bgp 65001
+ bgp router-id 2.2.2.2
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 8.8.8.8 remote-as 65001
+ neighbor 8.8.8.8 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 8.8.8.8 activate
+ !
+ address-family ipv4 vrf C-ONE
+  neighbor 172.2.12.12 remote-as 65012
+  neighbor 172.2.12.12 activate
+!
+line cons 0
+ logg sync
+ exec-t 45 45

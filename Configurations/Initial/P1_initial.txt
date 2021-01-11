@@ -1,0 +1,53 @@
+hostname P1
+!
+router ospf 1
+ router-id 5.5.5.5
+!
+interface Lo0
+ ip address 5.5.5.5 255.255.255.255
+ ip ospf 1 area 0
+!
+int Gi2
+ no shut
+int gi2.15
+ enc dot1q 15
+ ip address 10.1.5.5 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+int gi2.45
+ enc dot1q 45
+ ip address 10.4.5.5 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+int gi2.56
+ enc dot1q 56
+ ip address 10.5.6.5 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+int gi2.57
+ enc dot1q 57
+ ip address 10.5.7.5 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+int gi2.58
+ enc dot1q 58
+ ip address 10.5.8.5 255.255.255.0
+ ip ospf 1 area 0
+ mpls ip
+ ip pim sparse-mode
+!
+line cons 0
+ logg sync
+ exec-t 45 45
+!
+ip multicast-routing distributed
+no ip pim autorp
+!
+int Lo0
+ ip pim sparse-mode
+!
+ip pim register-source Lo0
